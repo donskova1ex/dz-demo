@@ -34,7 +34,6 @@ func sq() {
 			square := num * num
 			squares <- square
 		}
-
 	}()
 
 	for result := range squares {
