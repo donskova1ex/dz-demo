@@ -1,48 +1,44 @@
 package main
 
 import (
-    "fmt"
-    "math/rand"
-    "sync"
-    "time"
+	"fmt"
+	"math/rand"
+	"sync"
+	"time"
 )
 
 func main() {
-    rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano())
 
-    numChan := make(chan int)
-    squareChan := make(chan int)
+	numChan := make(chan int)
+	squareChan := make(chan int)
 
-    var wg sync.WaitGroup
+	var wg sync.WaitGroup
 
-    wg.Add(1)
-    go func() {
-        defer wg.Done()
-        for i := 0; i < 10; i++ {
-            num := rand.Intn(101)
-            numChan <- num
-        }
-        close(numChan)
-    }()
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		for i := 0; i < 10; i++ {
+			num := rand.Intn(101)
+			numChan <- num
+		}
+		close(numChan)
+	}()
 
-    wg.Add(1)
-    go func() {
-        defer wg.Done()
-        for num := range numChan {
-            squareChan <- num * num
-        }
-        close(squareChan)
-    }()
+	go func() {
+		defer wg.Done()
+		for num := range numChan {
+			squareChan <- num * num
+		}
+		close(squareChan)
+	}()
 
-    go func() {
-        wg.Wait()
-        close(squareChan)
-    }()
+	var results []int
+	for square := range squareChan {
+		results = append(results, square)
+	}
 
-    var results []int
-    for square := range squareChan {
-        results = append(results, square)
-    }
+	wg.Wait()
 
-    fmt.Println("Квадраты чисел:", results)
+	fmt.Println("Квадраты чисел:", results)
 }
