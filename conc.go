@@ -7,22 +7,17 @@ import (
 )
 
 func main() {
-	sq()
-}
+	numbers := make(chan int)  
+	squares := make(chan int) 
+	var wg sync.WaitGroup
 
-func sq() {
-	numbers := make(chan int)
-	squares := make(chan int)
-
-	var wg sync.WaitGroup 
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		defer close(numbers) 
+		defer close(numbers)
 		for i := 0; i < 10; i++ {
-			num := rand.Intn(101) 
-			numbers <- num
+			numbers <- rand.Intn(101) 
 		}
 	}()
 
@@ -34,7 +29,7 @@ func sq() {
 			squares <- num * num
 		}
 	}()
-
+	
 	var results []int
 	for sq := range squares {
 		results = append(results, sq)
@@ -43,6 +38,4 @@ func sq() {
 	wg.Wait()
 
 	fmt.Println(results)
-
-	
 }
