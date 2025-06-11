@@ -10,24 +10,20 @@ import (
 func main() {
     rand.Seed(time.Now().UnixNano())
 
-
     numChan := make(chan int)
     squareChan := make(chan int)
 
-
     var wg sync.WaitGroup
-
 
     wg.Add(1)
     go func() {
         defer wg.Done()
         for i := 0; i < 10; i++ {
-            num := rand.Intn(101) 
+            num := rand.Intn(101)
             numChan <- num
         }
-        close(numChan) 
+        close(numChan)
     }()
-
 
     wg.Add(1)
     go func() {
@@ -35,17 +31,18 @@ func main() {
         for num := range numChan {
             squareChan <- num * num
         }
-        close(squareChan) 
+        close(squareChan)
     }()
 
+    go func() {
+        wg.Wait()
+        close(squareChan)
+    }()
 
     var results []int
     for square := range squareChan {
         results = append(results, square)
     }
-
-
-    wg.Wait()
 
     fmt.Println("Квадраты чисел:", results)
 }
