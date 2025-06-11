@@ -14,14 +14,15 @@ func sq() {
 	numbers := make(chan int)
 	squares := make(chan int)
 
-	wg := &sync.WaitGroup{}
+	var wg sync.WaitGroup 
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		defer close(numbers)
+		defer close(numbers) 
 		for i := 0; i < 10; i++ {
-			numbers <- rand.Intn(101)
+			num := rand.Intn(101) 
+			numbers <- num
 		}
 	}()
 
@@ -34,13 +35,14 @@ func sq() {
 		}
 	}()
 
-	go func() {
-		wg.Wait()
-	}()
-
-	for result := range squares {
-		fmt.Printf("[%d] ", result)
+	var results []int
+	for sq := range squares {
+		results = append(results, sq)
 	}
+
+	wg.Wait()
+
+	fmt.Println(results)
 
 	
 }
