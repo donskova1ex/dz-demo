@@ -16,31 +16,33 @@ func sq() {
 
 	wg := &sync.WaitGroup{}
 
-	wg.Add(2)
-
+	  wg.Add(1)
 	go func() {
-		defer wg.Done()
-		defer close(numbers)
-		for i := 0; i < 10; i++ {
-			num := rand.Intn(101)
-			numbers <- num
-		}
-	}()
-
-	go func() {
-		defer wg.Done()
-		defer close(squares)
-		for num := range numbers {
-			square := num * num
-			squares <- square
-		}
-	}()
-
-	wg.Wait()
+	        defer wg.Done()
+	        defer close(numbers) 
+	        for i := 0; i < 10; i++ {
+	            numbers <- rand.Intn(101)
+	        }
+	    }()
 	
-	for result := range squares {
-		fmt.Printf("[%d] ", result)
-	}
+
+	    wg.Add(1)
+	    go func() {
+	        defer wg.Done()
+	        defer close(squares) 
+	        for num := range numbers {
+	            squares <- num * num
+	        }
+	    }()
+	
+	    // Горутина для вывода результатов
+	    go func() {
+	        for res := range squares {
+	            fmt.Printf("[%d] ", res)
+	        }
+	    }()
+	
+	    wg.Wait()
 
 	
 }
