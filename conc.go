@@ -36,9 +36,11 @@ func sq() {
 		}
 	}()
 
+	wg.Wait()
+	
 	for result := range squares {
 		fmt.Printf("[%d] ", result)
 	}
 
-	wg.Wait()
+	
 }
